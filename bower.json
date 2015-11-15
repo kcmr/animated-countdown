@@ -1,0 +1,32 @@
+{
+  "name": "animated-countdown",
+  "version": "0.1.0",
+  "authors": [
+    "Kus Cámara"
+  ],
+  "description": "An element to display an animated countdown",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "countdown",
+    "timer"
+  ],
+  "main": "animated-countdown.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/kcmr/animated-countdown/",
+  "ignore": [
+    "/.*",
+    "/bower_components",
+    "/*.css"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0",
+    "web-animations-js": "web-animations/web-animations-js#~2.1.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "paper-card": "PolymerElements/paper-card#~1.0.7",
+    "paper-button": "PolymerElements/paper-button#~1.0.8",
+    "paper-styles": "PolymerElements/paper-styles#~1.0.12"
+  }
+}
