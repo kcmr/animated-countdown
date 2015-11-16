@@ -76,7 +76,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-card heading="Auto Start with delay (default style)" elevation="1" animated-shadow="false">
         <div class="card-content">
           <animated-countdown id="demo-1" seconds="5" auto-start start-text="Loading…" autostart-delay="2000"></animated-countdown>
-          <pre class="language-html"><code>&lt;animated-countdown id=&quot;demo-1&quot; seconds=&quot;5&quot; auto-start start-text=&quot;Loading&hellip;&quot; autostart-delay=&quot;2000&quot;&gt; &lt;/animated-countdown&gt;</code></pre>
+          <pre class="language-html"><code>&lt;animated-countdown
+  seconds=&quot;5&quot;
+  auto-start
+  start-text=&quot;Loading&hellip;&quot;
+  autostart-delay=&quot;2000&quot;&gt;
+&lt;/animated-countdown&gt;</code></pre>
         </div>
         <div class="card-actions">
           <paper-button class="start" onclick="start(this)" data-target="#demo-1"><span>Start</span></paper-button>
@@ -89,7 +94,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-card heading="Inline" elevation="1" animated-shadow="false">
         <div class="card-content">
           <animated-countdown class="inline" id="demo-5" seconds="5" auto-start start-text="Inline countdown" autostart-delay="2000"></animated-countdown>
-          <pre class="language-html"><code>&lt;animated-countdown class=&quot;inline&quot; seconds=&quot;5&quot; auto-start start-text=&quot;Inline countdown&quot; autostart-delay=&quot;2000&quot;&gt;&lt;/animated-countdown&gt;</code></pre>
+          <pre class="language-html"><code>&lt;animated-countdown
+  class=&quot;inline&quot;
+  seconds=&quot;5&quot;
+  auto-start
+  start-text=&quot;Inline countdown&quot;
+  autostart-delay=&quot;2000&quot;&gt;
+&lt;/animated-countdown&gt;</code></pre>
         </div>
         <div class="card-actions">
           <paper-button class="start" onclick="start(this)" data-target="#demo-5"><span>Start</span></paper-button>
@@ -163,7 +174,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-card heading="Initial and final text with fadeOut on finish" elevation="1" animated-shadow="false">
         <div class="card-content">
           <animated-countdown id="demo-3" class="purple" seconds="5" start-text="Ready?" end-text="Go!" fade-on-finish></animated-countdown>
-          <pre><code class="language-html">&lt;animated-countdown class=&quot;purple&quot; seconds=&quot;5&quot; start-text=&quot;Ready?&quot; end-text=&quot;Go!&quot; fade-on-finish&gt;&lt;/animated-countdown&gt;</code></pre>
+          <pre><code class="language-html">&lt;animated-countdown
+  class=&quot;purple&quot;
+  seconds=&quot;5&quot;
+  start-text=&quot;Ready?&quot;
+  end-text=&quot;Go!&quot;
+  fade-on-finish&gt;
+&lt;/animated-countdown&gt;</code></pre>
         </div>
         <div class="card-actions">
           <paper-button class="start" onclick="start(this)" data-target="#demo-3"><span>Start</span></paper-button>
