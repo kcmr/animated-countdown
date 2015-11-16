@@ -1,7 +1,7 @@
 # animated-countdown
 
 An element to display an animated countdown using Polymer.   
-[Demo and documentation]()
+[Demo and documentation](http://kcmr.github.io/animated-countdown/)
 
 ## Install
 
@@ -35,7 +35,7 @@ Use it!:
   </animated-countdown>
 ```
 
-Check out the [demo]() for more examples and options.
+Check out the [demo](http://kcmr.github.io/animated-countdown/) for more examples and options.
 
 
 
