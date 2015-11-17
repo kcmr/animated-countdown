@@ -8,20 +8,13 @@
   color: inherit;
 }
 
-:host(:not(.visible)) {
-  transition: opacity 1s ease-in-out 200ms;
-}
-
-:host(.inline) {
-  display: inline-flex;
-}
+:host(:not(.visible)) { transition: opacity 1s ease-in-out 200ms; }
+:host(.inline) { display: inline-flex; }
 
 :host(.fade-out) {
   opacity: 0;
   pointer-events: none;
 }
-
-[hidden] { display: none; }
 
 .counter {
   display: inline-flex;

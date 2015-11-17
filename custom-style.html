@@ -11,22 +11,13 @@
   color: inherit;
 }
 
-:host(:not(.visible)) {
-  transition: opacity 1s ease-in-out 200ms;
-}
-
-:host(.inline) {
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
+:host(:not(.visible)) { transition: opacity 1s ease-in-out 200ms; }
+:host(.inline) { display: -webkit-inline-flex; display: -ms-inline-flexbox; display: inline-flex; }
 
 :host(.fade-out) {
   opacity: 0;
   pointer-events: none;
 }
-
-[hidden] { display: none; }
 
 .counter {
   display: -webkit-inline-flex;
