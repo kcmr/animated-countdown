@@ -171,6 +171,8 @@ __Inline__
         }
       },
 
+      _counterAnimation: Object,
+
       _finished: {
         type: Boolean,
         value: false
@@ -179,13 +181,25 @@ __Inline__
       _started: {
         type: Boolean,
         value: false
+      },
+
+      _paused: {
+        type: Boolean,
+        value: true
       }
 
     },
 
     attached: function() {
-      this._setText();
+      this._setCounterAnimation();
+      this._setInitialText();
       this._autoStart();
+    },
+
+    _setCounterAnimation: function() {
+      var counter = this.$.counter;
+      var keyframes = new KeyframeEffect(counter, this._animationKeyframes, this._animationSettings);
+      this._counterAnimation = new Animation(keyframes, counter.ownerDocument.timeline);
     },
 
     /**
@@ -193,40 +207,46 @@ __Inline__
      * the countdown is reset to its initial value (the seconds property).
      */
     start: function() {
-      this.classList.remove('fade-out');
-
-      if (!this._started) {
-        this.$.counter.textContent = this.seconds;
+      if (this._counterAnimation.playState === 'running') {
+        return;
       }
 
+      if (this._counterAnimation.playState === 'paused') {
+        this._counterAnimation.play();
+        this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
+        return;
+      }
+
+      // reset
+      this.classList.add('visible');
+      this.classList.remove('fade-out');
       this.cancelAsync(this.startTimeout);
       this.resetCounter();
+
+      // start
+      this._counterAnimation.play();
       this._started = true;
       this._finished = false;
       this.fire('animated-countdown-start');
-      this.counterAnimation = this.$.counter.animate(this._animationKeyframes, this._animationSettings);
+      this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
 
-      this.counterInterval = setInterval(this._countDown.bind(this), 1000);
-      this.counterAnimation.onfinish = this._onCountDownFinish.bind(this);
+      // events
+      this._counterAnimation.onfinish = this._onCounterAnimationFinish.bind(this);
     },
 
     /**
      * Stops the countdown.
      */
     stop: function() {
-      this._finished = true;
-      this.counterAnimation && this.counterAnimation.finish();
-      if (this.endText.trim()) {
-        this.$.counter.textContent = this.endText;
-      }
-      this.fire('animated-countdown-finish');
+      this._counterAnimation.finish();
     },
 
     /**
      * Pauses the countdown.
      */
     pause: function() {
-      this.counterAnimation && this.counterAnimation.finish();
+      this._counterAnimation.pause();
+      this._clearInteval();
       this.fire('animated-countdown-pause');
     },
 
@@ -234,39 +254,54 @@ __Inline__
      * Resets the countdown.
      */
     resetCounter: function() {
-      if (this._finished) {
-        this.$.counter.textContent = this.seconds;
-      }
+      this.$.counter.textContent = this.seconds;
     },
 
     /**
      * Resets the animated-countdown element to its initial state.
      */
     reset: function() {
+      this._counterAnimation.cancel();
+      this._clearInteval();
+      this.classList.add('visible');
       this.classList.remove('fade-out');
       this.stop();
       this.resetCounter();
       this._started = false;
-      this._setText();
+      this._setInitialText();
       this._autoStart();
     },
 
     _countDown: function() {
-      var time = parseInt(this.$.counter.textContent, 10) - 1;
-      this.$.counter.textContent = time;
-      if (time === 0 && !this.endText.trim()) {
-        this.stop();
-      } else if (time === -1) {
-        this.stop();
-      }
+      this.countdownInterval = this.async(function() {
+        var time = parseInt(this.$.counter.textContent, 10) - 1;
+        this.$.counter.textContent = time;
+        if (time === 0 && !this.endText.trim()) {
+          this.stop();
+        } else if (time === -1) {
+          this.stop();
+        }
+
+        this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
+      }, 1000);
     },
 
-    _onCountDownFinish: function() {
-      clearInterval(this.counterInterval);
+    _clearInteval: function() {
+      cancelAnimationFrame(this.counterInterval);
+      this.cancelAsync(this.countdownInterval);
+    },
+
+    _onCounterAnimationFinish: function() {
+      this._clearInteval();
+      this._finished = true;
       this.fadeOnFinish && this._fadeOnFinish();
+      if (this.endText.trim()) {
+        this.$.counter.textContent = this.endText;
+      }
+      this.fire('animated-countdown-finish');
     },
 
-    _setText: function() {
+    _setInitialText: function() {
       if (this.startText.trim()) {
         this.$.counter.textContent = this.startText;
       } else {
@@ -281,6 +316,7 @@ __Inline__
     },
 
     _fadeOnFinish: function() {
+      this.classList.remove('visible');
       this.classList.add('fade-out');
     }
 
