@@ -1,0 +1,320 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="web-animations-import.html">
+<link rel="import" href="custom-style.html">
+
+<!--
+# An element to display an animated countdown
+
+__Default style__
+
+The element fits all available horizontal space by default and the countdown is centered horizontally and vertically.
+Add the class `inline` to the element if you want to display it inline. The element height is not set.
+
+__Basic example__
+
+The seconds attribute is not required (defaults to 5).
+
+    <animated-countdown seconds="5"></animated-countdown>
+
+__Start and end texts__
+
+    <animated-countdown
+      start-text="Ready?"
+      end-text="Go!">
+    </animated-countdown>
+
+__Auto start__
+
+    <animated-countdown auto-start></animated-countdown>
+
+__Auto start with delay__
+
+    <animated-countdown
+      start-text="Loading…"
+      autostart-delay="2000"
+      auto-start>
+    </animated-countdown>
+
+__Fade out on finish__
+
+    <animated-countdown fade-on-finish></animated-countdown>
+
+__Inline__
+
+    <animated-countdown class="inline"></animated-countdown>
+
+@group Seed Elements
+@element animated-countdown
+@demo demo/index.html
+
+
+-->
+<dom-module id="animated-countdown">
+
+  <template>
+    <style include="custom-style"></style>
+    <span class="counter" id="counter"></span>
+  </template>
+
+</dom-module>
+
+<script>
+ // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+ // MIT license
+(function(){var lastTime=0;var vendors=['ms','moz','webkit','o'];for(var x=0;x<vendors.length&&!window.requestAnimationFrame;++x){window.requestAnimationFrame=window[vendors[x]+'RequestAnimationFrame'];window.cancelAnimationFrame=window[vendors[x]+'CancelAnimationFrame']||window[vendors[x]+'CancelRequestAnimationFrame']}if(!window.requestAnimationFrame)window.requestAnimationFrame=function(callback,element){var currTime=new Date().getTime();var timeToCall=Math.max(0,16-(currTime-lastTime));var id=window.setTimeout(function(){callback(currTime+timeToCall)},timeToCall);lastTime=currTime+timeToCall;return id};if(!window.cancelAnimationFrame)window.cancelAnimationFrame=function(id){clearTimeout(id)}}());
+
+  Polymer({
+
+    /**
+     * Fired when countdown ends.
+     *
+     * @event animated-countdown-finish
+     */
+
+    /**
+     * Fired when countdown starts.
+     *
+     * @event animated-countdown-start
+     */
+
+    /**
+     * Fired when countdown is paused.
+     *
+     * @event animated-countdown-pause
+     */
+
+    is: 'animated-countdown',
+
+    hostAttributes: {
+      'role': 'timer',
+      'aria-live': 'assertive'
+    },
+
+    properties: {
+
+      /**
+       * Number of countdown seconds.
+       */
+      seconds: {
+        type: Number,
+        value: 5
+      },
+
+      /**
+       * Text shown before the countdown starts.
+       */
+      startText: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * Text shown after the countdown ends.
+       */
+      endText: {
+        type: String,
+        value: ''
+      },
+
+      /**
+       * Boolean attribute indicating whether the countdown starts automatically.
+       */
+      autoStart: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Delay in milliseconds to start the countdown. This attribute only applies
+       * if the autoStart attribute has been set.
+       */
+      autostartDelay: {
+        type: Number,
+        value: 0
+      },
+
+      /**
+       * Boolean attribute indicating whether the element should fade out when the countdown ends.
+       */
+      fadeOnFinish: {
+        type: Boolean,
+        value: false
+      },
+
+      _animationKeyframes: {
+        type: Array,
+        value: [
+          { opacity: 0, transform: 'scale(.4)' },
+          { opacity: .6, transform: 'scale(.9)' },
+          { opacity: 1, transform: 'scale(1.2)' }
+        ]
+      },
+
+      _animationSettings: {
+        type: Object,
+        value: {
+          duration: 500,
+          easing: 'ease-in-out',
+          delay: 0,
+          iterations: 1000,
+          direction: 'alternate',
+          fill: 'backwards'
+        }
+      },
+
+      _counterAnimation: Object,
+
+      _finished: {
+        type: Boolean,
+        value: false
+      },
+
+      _started: {
+        type: Boolean,
+        value: false
+      }
+
+    },
+
+    attached: function() {
+      this._setCounterAnimation();
+      this._setInitialText();
+      this._autoStart();
+    },
+
+    _setCounterAnimation: function() {
+      var counter = this.$.counter;
+      var keyframes = new KeyframeEffect(counter, this._animationKeyframes, this._animationSettings);
+      this._counterAnimation = new Animation(keyframes, counter.ownerDocument.timeline);
+    },
+
+    /**
+     * Starts the countdown. If the countdown has been previously stopped,
+     * the countdown is reset to its initial value (the seconds property).
+     */
+    start: function() {
+      if (this._counterAnimation.playState === 'running') {
+        return;
+      }
+
+      if (this._counterAnimation.playState === 'paused') {
+        this._counterAnimation.play();
+        this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
+        return;
+      }
+
+      // reset
+      this.classList.add('visible');
+      this.classList.remove('fade-out');
+      this.cancelAsync(this.startTimeout);
+      this.resetCounter();
+
+      // start
+      this._counterAnimation.play();
+      this._started = true;
+      this._finished = false;
+      this.fire('animated-countdown-start');
+      this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
+
+      // events
+      this._counterAnimation.onfinish = this._onCounterAnimationFinish.bind(this);
+    },
+
+    /**
+     * Stops the countdown.
+     */
+    stop: function() {
+      this._counterAnimation.finish();
+    },
+
+    /**
+     * Pauses the countdown.
+     */
+    pause: function() {
+      this._counterAnimation.pause();
+      this._clearInteval();
+      this.fire('animated-countdown-pause');
+    },
+
+    /**
+     * Resets the countdown.
+     */
+    resetCounter: function() {
+      this.$.counter.textContent = this.seconds;
+    },
+
+    /**
+     * Resets the animated-countdown element to its initial state.
+     */
+    reset: function() {
+      this._counterAnimation.cancel();
+      this._clearInteval();
+      this.classList.add('visible');
+      this.classList.remove('fade-out');
+      this.stop();
+      this.resetCounter();
+      this._started = false;
+      this._setInitialText();
+      this._autoStart();
+    },
+
+    _countDown: function() {
+      this.countdownInterval = this.async(function() {
+        var time = parseInt(this.$.counter.textContent, 10) - 1;
+        this.$.counter.textContent = time;
+        if (time === 0 && !this.endText.trim()) {
+          this.stop();
+        } else if (time === -1) {
+          this.stop();
+        }
+
+        this.counterInterval = requestAnimationFrame(this._countDown.bind(this));
+      }, 1000);
+    },
+
+    _clearInteval: function() {
+      cancelAnimationFrame(this.counterInterval);
+      this.cancelAsync(this.countdownInterval);
+    },
+
+    _onCounterAnimationFinish: function() {
+      this._clearInteval();
+      this._finished = true;
+      this.fadeOnFinish && this._fadeOnFinish();
+      if (this.endText.trim()) {
+        this.$.counter.textContent = this.endText;
+      }
+      this.fire('animated-countdown-finish');
+    },
+
+    _setInitialText: function() {
+      if (this.startText.trim()) {
+        this.$.counter.textContent = this.startText;
+      } else {
+        this.$.counter.textContent = '';
+      }
+    },
+
+    _autoStart: function() {
+      if (this.autoStart) {
+        this.startTimeout = this.async(this.start, this.autostartDelay);
+      }
+    },
+
+    _fadeOnFinish: function() {
+      this.classList.remove('visible');
+      this.classList.add('fade-out');
+    }
+
+  });
+
+</script>
