@@ -3,7 +3,7 @@
   "authors": [
     "Kus Cámara"
   ],
-  "description": "An element to display an animated countdown",
+  "description": "A Polymer element to display an animated countdown",
   "keywords": [
     "web-component",
     "Polymer",
@@ -11,7 +11,6 @@
     "timer"
   ],
   "main": "animated-countdown.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
   "homepage": "https://github.com/kcmr/animated-countdown/",
   "ignore": [
     "/.*",
