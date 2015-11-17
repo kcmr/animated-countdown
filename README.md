@@ -1,4 +1,4 @@
-# `<animated-countdown>
+# &lt;animated-countdown&gt;
 
 A Polymer element to display an animated countdown.   
 [Demo and documentation](http://kcmr.github.io/animated-countdown/)
