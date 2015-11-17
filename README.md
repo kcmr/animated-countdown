@@ -1,6 +1,6 @@
-# animated-countdown
+# `<animated-countdown>
 
-An element to display an animated countdown using Polymer.   
+A Polymer element to display an animated countdown.   
 [Demo and documentation](http://kcmr.github.io/animated-countdown/)
 
 ## Install
