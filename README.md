@@ -31,7 +31,7 @@ Use it!:
   <animated-countdown 
     seconds="3" 
     start-text="Ready?"
-    end-text="Go!"
+    end-text="Go!">
   </animated-countdown>
 ```
 
